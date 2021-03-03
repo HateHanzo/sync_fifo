@@ -16,7 +16,7 @@ module sync_fifo(
 //parametr
 parameter DLY         = 1              ;
 parameter WIDTH_FIFO  = 8              ;
-parameter ADDR_FIFO   = 3              ;
+parameter ADDR_FIFO   = 4              ;
 parameter DEPTH_FIFO  = 1 << ADDR_FIFO ;
 
 //input output
@@ -33,9 +33,10 @@ output                     full   ;
 //-----------------------------
 //--signal
 //-----------------------------
-reg    [ADDR_FIFO:0]    wbin                ; 
-reg    [ADDR_FIFO:0]    rbin                ;
-reg    [WIDTH_FIFO-1:0] mem[DEPTH_FIFO-1:0] ;
+reg    [WIDTH_FIFO-1:0]    rdata               ;
+reg    [ADDR_FIFO:0]       wbin                ; 
+reg    [ADDR_FIFO:0]       rbin                ;
+reg    [WIDTH_FIFO-1:0]    mem[DEPTH_FIFO-1:0] ;
 
 
 //-----------------------------
@@ -46,7 +47,7 @@ reg    [WIDTH_FIFO-1:0] mem[DEPTH_FIFO-1:0] ;
 //write logic
 //------------------
 
-wire wbin_next = ( wen && (!full) ) ? (wbin + {{{ADDR_FIFO}{1'b0}},1'b1}) ;
+wire wbin_next = ( wen && (!full) ) ? (wbin + {{{ADDR_FIFO}{1'b0}},1'b1}) : wbin ;
 
 always@(posedge clk or negedge rst_n)
 begin
@@ -71,7 +72,7 @@ wire full = (wbin[ADDR_FIFO]^rbin[ADDR_FIFO]) &&
 //read logic
 //-----------------
 
-wire rbin_next = ( ren && (!empty) ) ? (rbin + {{{ADDR_FIFO}{1'b0}},1'b1}) ;
+wire rbin_next = ( ren && (!empty) ) ? (rbin + {{{ADDR_FIFO}{1'b0}},1'b1}) : rbin ;
 
 always@(posedge clk or negedge rst_n)
 begin
